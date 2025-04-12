@@ -69,8 +69,8 @@ export default function RootLayout({
                 </div>
                 <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
                   <div className="text-sm text-center">
-                    <p>&copy; 2024 Lịch Cúp Điện. All rights reserved.</p>
-                    <p className="mt-2">Dữ liệu được cung cấp bởi lichcatdien.com</p>
+                    <p>&copy; 2025 Lịch Cúp Điện. All rights reserved.</p>
+                    <p className="mt-2">Dữ liệu được cung cấp bởi Đạt Pro Max</p>
                   </div>
                 </div>
               </div>

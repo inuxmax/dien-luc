@@ -267,309 +267,234 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <div className="bg-blue-600 text-white py-16 relative">
-        <div className="absolute top-4 right-4 sm:right-8 lg:right-12 w-64">
-          <WeatherWidget />
-        </div>
-        <div className="container mx-auto text-center">
-          <h1 className="text-4xl font-bold mb-4">Tra cứu lịch cúp điện</h1>
-          <p className="text-xl mb-8">
-            Cập nhật thông tin cúp điện mới nhất từ các công ty điện lực trên toàn quốc
-          </p>
+    <div className="container mx-auto px-4 py-6">
+      <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mb-4">
+        Cập nhật thông tin cúp điện mới nhất từ các công ty điện lực trên toàn quốc
+      </h1>
+
+      {/* Weather Widget - Chỉ hiển thị trên mobile */}
+      <div className="md:hidden mb-6">
+        <WeatherWidget />
+      </div>
+
+      {/* Search and Filter Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
+        <div className="flex flex-col gap-4">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Nhập tên khu vực hoặc tỉnh thành..."
+              className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black dark:text-white dark:bg-gray-700"
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleSearch();
+                }
+              }}
+            />
+            <button
+              onClick={handleSearch}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              Tìm kiếm
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button 
+              className={`px-3 py-1 rounded-full text-sm font-medium ${
+                !selectedRegion ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+              onClick={() => setSelectedRegion('')}
+            >
+              Tất cả
+            </button>
+            {Object.keys(regions).map((region) => (
+              <button
+                key={region}
+                className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  selectedRegion === region ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+                onClick={() => setSelectedRegion(region)}
+              >
+                {region}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Search Section */}
-      <section className="py-12 bg-white dark:bg-gray-900">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="card dark:bg-gray-800">
-            <div className="p-6">
-              <div className="flex flex-col gap-4">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Nhập tên khu vực hoặc tỉnh thành..."
-                    className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black dark:text-white dark:bg-gray-700"
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        handleSearch();
-                      }
-                    }}
-                  />
-                  <button
-                    onClick={handleSearch}
-                    className="btn-primary px-4 py-2 flex items-center dark:bg-blue-600 dark:hover:bg-blue-700"
-                  >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    Tìm kiếm
-                  </button>
+      {/* Results Section - Moved to top */}
+      {error && (
+        <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+          <p className="text-red-700 dark:text-red-200">{error}</p>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 mb-6 text-center">
+          <div className="loading-spinner mx-auto dark:border-white"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Đang tải dữ liệu...</p>
+        </div>
+      ) : powerOutages.length > 0 ? (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6">
+          <div className="p-4">
+            <h2 className="text-xl font-semibold mb-4 dark:text-white">Lịch cúp điện</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-900">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Ngày</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Khu vực</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Đơn vị</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Thông tin</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                  {currentOutages.map((outage, index) => {
+                    const timeRange = `từ ${outage.time.split('-')[0].trim()}`;
+                    const selectedProvinceData = provinces.find(p => p.slug === selectedProvince);
+                    const powerCompanyName = selectedProvinceData 
+                      ? `Điện lực ${selectedProvinceData.name}`
+                      : 'Điện lực';
+                    return (
+                      <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <div className="text-sm text-gray-900 dark:text-white">{outage.date}</div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">{timeRange}</div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="text-sm text-gray-900 dark:text-white whitespace-pre-line">{formatLocation(outage.location)}</div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="text-sm text-gray-900 dark:text-white">{powerCompanyName}</div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="text-sm text-gray-900 dark:text-white whitespace-pre-line">{outage.reason || ''}</div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            <div className="mt-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 py-3 sm:px-6">
+              <div className="flex flex-1 justify-between sm:hidden">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
+                >
+                  Trang trước
+                </button>
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
+                >
+                  Trang sau
+                </button>
+              </div>
+              <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                    Hiển thị <span className="font-medium">{currentPage * itemsPerPage - itemsPerPage + 1}</span>
+                    {' '}-{' '}
+                    <span className="font-medium">{Math.min(currentPage * itemsPerPage, powerOutages.length)}</span>
+                    {' '}trong tổng số{' '}
+                    <span className="font-medium">{powerOutages.length}</span> kết quả
+                  </p>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {Object.keys(regions).map((region) => (
-                    <button
-                      key={region}
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        selectedRegion === region 
-                          ? 'bg-blue-500 text-white' 
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                      }`}
-                      onClick={() => {
-                        setSelectedRegion(region);
-                        setSelectedProvince('');
-                        setPowerOutages([]);
-                      }}
-                    >
-                      {region}
-                    </button>
-                  ))}
+                <div>
+                  <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                    {getPageNumbers(currentPage, totalPages).map((page, index) => (
+                      <button
+                        key={index}
+                        onClick={() => typeof page === 'number' && handlePageChange(page)}
+                        disabled={page === '...'}
+                        className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
+                          page === currentPage
+                            ? 'z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
+                            : page === '...'
+                            ? 'text-gray-700 dark:text-gray-300 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:outline-offset-0'
+                            : 'text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-offset-0'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                  </nav>
                 </div>
-                {selectedRegion && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                    {regions[selectedRegion].map((provinceName) => {
-                      const province = provinces.find(p => p.name === provinceName);
-                      if (!province) return null;
-                      const stats = outageStats[province.slug] || { total: 0, today: 0, upcoming: 0 };
-                      return (
-                        <button
-                          key={province.slug}
-                          className={`p-2 rounded-lg text-sm ${
-                            selectedProvince === province.slug
-                              ? 'bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border-2 border-blue-500'
-                              : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                          }`}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : selectedProvince && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6 text-center">
+          <p className="text-gray-600 dark:text-gray-300">Không có thông tin lịch cúp điện cho tỉnh thành này.</p>
+        </div>
+      )}
+
+      {/* Regions Section */}
+      <section className="mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+          <div className="flex flex-col space-y-4">
+            <h2 className="text-xl font-semibold dark:text-white">Danh sách Công ty Điện lực</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredProvinces.map((province) => {
+                const stats = outageStats[province.slug] || { total: 0, today: 0, upcoming: 0 };
+                return (
+                  <div key={province.slug} className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 overflow-hidden hover:shadow-md transition-shadow">
+                    <div className="p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">{province.name}</h3>
+                          <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mb-2">
+                            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            {Object.entries(regions).find(([_, provinces]) => provinces.includes(province.name))?.[0]}
+                          </div>
+                          <div className="grid grid-cols-3 gap-2">
+                            <div className="text-center">
+                              <div className="text-sm font-semibold text-blue-600 dark:text-blue-400">{stats.total}</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">Tổng số</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-sm font-semibold text-green-600 dark:text-green-400">{stats.today}</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">Hôm nay</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-sm font-semibold text-orange-600 dark:text-orange-400">{stats.upcoming}</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">Sắp tới</div>
+                            </div>
+                          </div>
+                        </div>
+                        <button 
+                          className="ml-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-xs font-medium flex items-center"
                           onClick={() => {
                             setSelectedProvince(province.slug);
                             handleProvinceChange(province.slug);
+                            scrollToTop();
                           }}
                         >
-                          <div className="font-medium">{province.name}</div>
-                          <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">{stats.total} lịch cắt điện</div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Results Section */}
-      <section className="py-12 bg-gray-50 dark:bg-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {error && (
-            <div className="error-message mb-6 dark:bg-red-900 dark:border-red-800">
-              <p>{error}</p>
-            </div>
-          )}
-
-          {loading ? (
-            <div className="text-center py-12">
-              <div className="loading-spinner mx-auto dark:border-white"></div>
-              <p className="mt-4 text-gray-600 dark:text-gray-300">Đang tải dữ liệu...</p>
-            </div>
-          ) : powerOutages.length > 0 ? (
-            <div className="card dark:bg-gray-900">
-              <div className="p-6">
-                <h2 className="text-2xl font-semibold mb-6 dark:text-white">Lịch cúp điện</h2>
-                <div className="table-container">
-                  <table className="table dark:text-gray-300">
-                    <thead className="dark:bg-gray-800">
-                      <tr>
-                        <th>Ngày</th>
-                        <th>Khu vực</th>
-                        <th>Đơn vị</th>
-                        <th>Thông tin</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {currentOutages.map((outage, index) => {
-                        const timeRange = `từ ${outage.time.split('-')[0].trim()}`;
-                        const selectedProvinceData = provinces.find(p => p.slug === selectedProvince);
-                        const powerCompanyName = selectedProvinceData 
-                          ? `Điện lực ${selectedProvinceData.name}`
-                          : 'Điện lực';
-                        return (
-                          <tr key={index} className="dark:hover:bg-gray-800">
-                            <td>
-                              {outage.date}
-                              <div className="text-sm text-gray-500 dark:text-gray-400">{timeRange}</div>
-                            </td>
-                            <td className="whitespace-pre-line">{formatLocation(outage.location)}</td>
-                            <td>{powerCompanyName}</td>
-                            <td className="whitespace-pre-line">{outage.reason || ''}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                  
-                  {/* Pagination */}
-                  <div className="mt-6 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3 sm:px-6">
-                    <div className="flex flex-1 justify-between sm:hidden">
-                      <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className="relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
-                      >
-                        Trang trước
-                      </button>
-                      <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
-                      >
-                        Trang sau
-                      </button>
-                    </div>
-                    <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                      <div>
-                        <p className="text-sm text-gray-700 dark:text-gray-300">
-                          Hiển thị <span className="font-medium">{currentPage * itemsPerPage - itemsPerPage + 1}</span>
-                          {' '}-{' '}
-                          <span className="font-medium">{Math.min(currentPage * itemsPerPage, powerOutages.length)}</span>
-                          {' '}trong tổng số{' '}
-                          <span className="font-medium">{powerOutages.length}</span> kết quả
-                        </p>
-                      </div>
-                      <div>
-                        <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                          <button
-                            onClick={() => handlePageChange(currentPage - 1)}
-                            disabled={currentPage === 1}
-                            className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 dark:text-gray-500 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
-                          >
-                            <span className="sr-only">Trang trước</span>
-                            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                              <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
-                            </svg>
-                          </button>
-                          
-                          {getPageNumbers(currentPage, totalPages).map((page, index) => (
-                            <button
-                              key={index}
-                              onClick={() => typeof page === 'number' && handlePageChange(page)}
-                              disabled={page === '...'}
-                              className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-                                page === currentPage
-                                  ? 'z-10 bg-blue-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
-                                  : page === '...'
-                                  ? 'text-gray-700 dark:text-gray-300 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:outline-offset-0'
-                                  : 'text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-offset-0'
-                              }`}
-                            >
-                              {page}
-                            </button>
-                          ))}
-
-                          <button
-                            onClick={() => handlePageChange(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                            className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 dark:text-gray-500 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
-                          >
-                            <span className="sr-only">Trang sau</span>
-                            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                              <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
-                            </svg>
-                          </button>
-                        </nav>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : selectedProvince && (
-            <div className="empty-state dark:text-gray-300">
-              <p>Không có thông tin lịch cúp điện cho tỉnh thành này.</p>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Regions Section */}
-      <section className="py-12 bg-white dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-semibold dark:text-white">Danh sách Công ty Điện lực</h2>
-            <div className="flex space-x-4">
-              <button 
-                className={`px-4 py-2 rounded-md text-sm font-medium ${
-                  !selectedRegion ? 'bg-blue-500 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                }`}
-                onClick={() => setSelectedRegion('')}
-              >
-                Tất cả
-              </button>
-              {Object.keys(regions).map((region) => (
-                <button
-                  key={region}
-                  className={`px-4 py-2 rounded-md text-sm font-medium ${
-                    selectedRegion === region ? 'bg-blue-500 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                  onClick={() => setSelectedRegion(region)}
-                >
-                  {region}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {filteredProvinces.map((province) => {
-              const stats = outageStats[province.slug] || { total: 0, today: 0, upcoming: 0 };
-              return (
-                <div key={province.slug} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{province.name}</h3>
-                        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-4">
-                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          Chi tiết
+                          <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                           </svg>
-                          {Object.entries(regions).find(([_, provinces]) => provinces.includes(province.name))?.[0]}
-                        </div>
-                        <div className="grid grid-cols-3 gap-4 mb-4">
-                          <div className="text-center">
-                            <div className="text-lg font-semibold text-blue-600 dark:text-blue-400">{stats.total}</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">Tổng số</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="text-lg font-semibold text-green-600 dark:text-green-400">{stats.today}</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">Hôm nay</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="text-lg font-semibold text-orange-600 dark:text-orange-400">{stats.upcoming}</div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">Sắp tới</div>
-                          </div>
-                        </div>
+                        </button>
                       </div>
-                      <button 
-                        className="ml-4 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium flex items-center"
-                        onClick={() => {
-                          setSelectedProvince(province.slug);
-                          handleProvinceChange(province.slug);
-                          scrollToTop();
-                        }}
-                      >
-                        Xem chi tiết
-                        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
