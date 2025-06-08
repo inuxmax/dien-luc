@@ -10,6 +10,7 @@ export default function Logo() {
         width={40}
         height={40}
         className="rounded-full"
+        unoptimized
       />
       <div>
         <h1 className="text-2xl font-bold">Lịch Cúp Điện</h1>
