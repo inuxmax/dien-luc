@@ -7,8 +7,8 @@ export default function Logo() {
       <Image
         src="https://i.ibb.co/Y4QJRMj2/Mail1s-Net.png"
         alt="Lịch Cúp Điện Logo"
-        width={40}
-        height={40}
+        width={220}
+        height={50}
         className="rounded-full"
         unoptimized
       />
