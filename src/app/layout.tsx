@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ThemeProvider } from "next-themes";
 import ThemeToggle from "@/components/ThemeToggle";
 import Script from "next/script";
+import Logo from "@/components/Logo";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -41,10 +42,7 @@ export default function RootLayout({
           <div className="min-h-screen bg-white dark:bg-gray-900">
             <header className="bg-blue-600 dark:bg-blue-800 text-white shadow-sm">
               <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-                <div>
-                  <h1 className="text-2xl font-bold">Lịch Cúp Điện</h1>
-                  <p className="text-sm opacity-90">{currentDate}</p>
-                </div>
+                <Logo />
                 <ThemeToggle />
               </div>
             </header>
