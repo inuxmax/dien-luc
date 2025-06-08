@@ -74,6 +74,7 @@ export default function RootLayout({
                   </div>
                 </div>
               </div>
+              <script data-host="https://1dg.vn" data-dnt="false" src="https://1dg.vn/js/script.js" id="ZwSg9rf6GA" async defer></script>
             </footer>
           </div>
         </ThemeProvider>
