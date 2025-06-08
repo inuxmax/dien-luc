@@ -4,6 +4,7 @@ import "./globals.css";
 import Link from "next/link";
 import { ThemeProvider } from "next-themes";
 import ThemeToggle from "@/components/ThemeToggle";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,6 +27,15 @@ export default function RootLayout({
 
   return (
     <html lang="vi" suppressHydrationWarning>
+      <head>
+        <Script
+          data-host="https://1dg.vn"
+          data-dnt="false"
+          src="https://1dg.vn/js/script.js"
+          id="ZwSg9rf6GA"
+          strategy="afterInteractive"
+        />
+      </head>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <div className="min-h-screen bg-white dark:bg-gray-900">
@@ -74,11 +84,9 @@ export default function RootLayout({
                   </div>
                 </div>
               </div>
-              
             </footer>
           </div>
         </ThemeProvider>
-        <script data-host="https://1dg.vn" data-dnt="false" src="https://1dg.vn/js/script.js" id="ZwSg9rf6GA" async defer></script>
       </body>
     </html>
   );
