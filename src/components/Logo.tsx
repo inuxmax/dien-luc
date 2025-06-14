@@ -29,7 +29,7 @@ export default function Logo() {
   return (
     <Link href="/" className="flex items-center space-x-2">
       <Image
-        src="https://i.ibb.co/Y4QJRMj2/Mail1s-Net.png"
+        src="https://i.postimg.cc/Wz3NR3gZ/Mail1s-Net.png"
         alt="Lịch Cúp Điện Logo"
         width={40}
         height={40}
